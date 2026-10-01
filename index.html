@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Envío de comprobante de pago</title>
+<style>
+:root{--rojo:#d71920;--oscuro:#15171a;--gris:#f5f6f8;--borde:#dce0e5;--verde:#137a44}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--gris);color:var(--oscuro)}
+header{background:var(--rojo);color:#fff;padding:18px 22px;box-shadow:0 2px 8px #0002}
+.head{max-width:1050px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:25px;font-weight:800}
+.secure{font-size:13px}
+main{max-width:1050px;margin:42px auto;padding:0 20px;display:grid;grid-template-columns:.85fr 1.15fr;gap:38px;align-items:center}
+h1{font-size:42px;line-height:1.08;margin:0 0 18px}
+.intro{font-size:18px;line-height:1.6;color:#59616d}
+.benefits{padding:0;list-style:none;color:#4b5563}
+.benefits li{margin:13px 0}
+.benefits li:before{content:'✓';color:var(--verde);font-weight:bold;margin-right:9px}
+.card{background:#fff;border:1px solid var(--borde);border-radius:24px;padding:30px;box-shadow:0 16px 40px #1f29371a}
+.card h2{margin:0 0 5px}
+.small{font-size:13px;color:#6b7280}
+label{display:block;margin:21px 0 7px;font-size:14px;font-weight:700}
+input{width:100%;padding:14px;border:1px solid #bfc5cc;border-radius:11px;font-size:16px}
+input:focus{outline:3px solid #d7192022;border-color:var(--rojo)}
+.drop{display:block;border:2px dashed #bcc3cb;border-radius:15px;padding:24px;text-align:center;background:#fafbfc;cursor:pointer}
+.drop:hover{border-color:var(--rojo);background:#fff6f6}
+.drop input{display:none}
+.filename{margin-top:9px;font-size:13px;color:#475569;overflow-wrap:anywhere}
+button{width:100%;border:0;border-radius:11px;background:var(--rojo);color:#fff;padding:15px;margin-top:22px;font-size:16px;font-weight:800;cursor:pointer}
+button:disabled{opacity:.65;cursor:not-allowed}
+.msg{margin-top:16px;padding:13px;border-radius:10px;font-size:14px;display:none}
+.error{display:block;background:#fff1f2;color:#a61118;border:1px solid #fecdd3}
+.ok{display:block;background:#ecfdf3;color:#116534;border:1px solid #bbf7d0}
+.legal{font-size:11px;line-height:1.5;color:#6b7280;margin-top:15px;text-align:center}
+.hidden{display:none}
+.folio{font-size:24px;color:var(--rojo);font-weight:900;margin:18px 0}
+/* honeypot anti-spam: campo invisible para humanos */
+._gotcha{display:none !important}
+@media(max-width:800px){
+  main{grid-template-columns:1fr;margin:25px auto}
+  .intro-panel{padding:10px 3px}
+  h1{font-size:34px}
+  .card{padding:22px}
+  .secure{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="brand">CLARO</div>
+    <div class="secure">Sitio seguro · Recepción de comprobantes</div>
+  </div>
+</header>
+
+<main>
+  <section class="intro-panel">
+    <h1>Envío de comprobante de pago</h1>
+    <p class="intro">Registra los datos de facturación y adjunta una imagen legible de tu comprobante.</p>
+    <ul class="benefits">
+      <li>Proceso rápido desde celular o computadora</li>
+      <li>Formatos JPG, PNG o PDF</li>
+      <li>Confirmación con número de gestión</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <form id="form">
+      <!-- ===== CONFIGURACIÓN DE FORMINIT (antes Getform) =====
+           El correo de destino (henry.vasquez@claro.com.hn) NO se define aquí en el HTML.
+           Ese destino queda fijo en la configuración de notificaciones de Forminit
+           (Formulario "Recepcion comprobantes" → Settings → Notifications).
+           Form ID: yszgjne8np3 -->
+
+      <input type="hidden" name="subject" id="subjectField" value="Nuevo comprobante de pago">
+      <input type="hidden" name="folio" id="folioField" value="">
+      <!-- Campo honeypot anti-spam de Forminit/Getform: debe quedar vacío y oculto -->
+      <input type="text" name="_gotcha" class="_gotcha" tabindex="-1" autocomplete="off">
+
+      <h2>Datos del pago</h2>
+      <div class="small">Todos los campos son obligatorios.</div>
+
+      <label for="nombre">Nombre completo</label>
+      <input id="nombre" name="Nombre_completo" maxlength="100" autocomplete="name" required placeholder="Ej. Henry Vásquez">
+
+      <label for="contrato">Número o contrato de facturación</label>
+      <input id="contrato" name="Numero_o_contrato_de_facturacion" maxlength="50" autocomplete="off" required placeholder="Ej. 123456789">
+
+      <label for="contacto">Correo electrónico o teléfono de contacto</label>
+      <input id="contacto" name="Correo_o_telefono_de_contacto" maxlength="100" autocomplete="email" required placeholder="cliente@empresa.com o 9999-9999">
+
+      <label>Adjuntar comprobante de pago</label>
+      <label class="drop" for="archivo">
+        <strong>Selecciona una imagen o archivo</strong>
+        <div class="small">JPG, PNG o PDF · máximo 5 MB</div>
+        <div id="filename" class="filename"></div>
+        <input id="archivo" name="attachment" type="file" accept="image/jpeg,image/png,application/pdf" required>
+      </label>
+
+      <div id="msg" class="msg" role="alert"></div>
+
+      <button id="send" type="submit">Enviar comprobante</button>
+
+      <p class="legal">La información será utilizada exclusivamente para validar y dar seguimiento al pago. No incluyas contraseñas, PIN ni datos completos de tarjetas.</p>
+    </form>
+
+    <div id="success" class="hidden" style="text-align:center">
+      <h2>Comprobante recibido</h2>
+      <p>Conserva este número para seguimiento:</p>
+      <div id="folioShown" class="folio"></div>
+      <button type="button" onclick="location.reload()">Registrar otro comprobante</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const FORM_ENDPOINT = 'https://forminit.com/f/yszgjne8np3';
+const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const permitidos = ["image/jpeg", "image/png", "application/pdf"];
+
+const form = document.getElementById('form');
+const fileInput = document.getElementById('archivo');
+const msg = document.getElementById('msg');
+const btn = document.getElementById('send');
+
+fileInput.addEventListener('change', () => {
+  const f = fileInput.files[0];
+  document.getElementById('filename').textContent = f ? `${f.name} · ${(f.size / 1048576).toFixed(2)} MB` : '';
+});
+
+function show(text, type = 'error') {
+  msg.textContent = text;
+  msg.className = 'msg ' + type;
+}
+
+function folioLocal() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const rand = crypto.getRandomValues(new Uint32Array(1))[0].toString().slice(-6).padStart(6, '0');
+  return `CP-${y}${m}${day}-${rand}`;
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  msg.className = 'msg';
+
+  const nombre = document.getElementById('nombre').value.trim();
+  const contrato = document.getElementById('contrato').value.trim();
+  const contacto = document.getElementById('contacto').value.trim();
+  const file = fileInput.files[0];
+
+  if (!nombre || !contrato || !contacto || !file) {
+    return show('Completa todos los campos y adjunta el comprobante.');
+  }
+  if (!permitidos.includes(file.type)) {
+    return show('Formato no permitido. Usa JPG, PNG o PDF.');
+  }
+  if (file.size > MAX_BYTES) {
+    return show('El archivo supera el máximo permitido de 5 MB.');
+  }
+
+  const folio = folioLocal();
+  document.getElementById('folioField').value = folio;
+  document.getElementById('subjectField').value = `Nuevo comprobante de pago - ${nombre} - ${folio}`;
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const data = new FormData(form);
+    const res = await fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: data
+    });
+
+    if (!res.ok) {
+      let detail = '';
+      try { const j = await res.json(); detail = j.message || ''; } catch (_) {}
+      throw new Error(detail || `HTTP ${res.status}`);
+    }
+
+    form.classList.add('hidden');
+    document.getElementById('success').classList.remove('hidden');
+    document.getElementById('folioShown').textContent = folio;
+  } catch (err) {
+    show('No fue posible enviar el comprobante. Intenta nuevamente o comunícate con el canal de atención.');
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Enviar comprobante';
+  }
+});
+</script>
+</body>
+</html>
